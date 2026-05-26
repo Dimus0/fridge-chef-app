@@ -1,0 +1,13 @@
+[project]
+name = "fridge-app"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiosqlite>=0.22.1",
+    "fastapi>=0.136.3",
+    "fastapi-users[sqlalchemy]>=15.0.5",
+    "python-dotenv>=1.2.2",
+    "uvicorn[standart]>=0.48.0",
+]
