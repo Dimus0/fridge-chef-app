@@ -1,6 +1,33 @@
-from fastapi import FastAPI, HTTPException,File, UploadFile,Form,Depends
-from app.models.schema import PostCreate,PostResponse
-from app.db.db import Post, create_db_tables, get_async_session
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.db.database import create_db_tables
 from contextlib import asynccontextmanager
-from sqlalchemy import select
+
+from app.routers import auth as auth_routers
+from app.routers import recipe as recipe_routers
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Перевіряємо БД та створюємо таблиці")
+
+    try:
+        await create_db_tables()
+        print("Table a sucsses created!")
+    except Exception as e:
+        print(f"Error: {e}")
+
+    yield
+
+    print("Server STOPED")
+
+app = FastAPI(title="FridgeChef API", lifespan=lifespan)
+app.include_router(router=auth_routers.router)
+app.include_router(router=recipe_routers.router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"], # адреса майбутнього React
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
