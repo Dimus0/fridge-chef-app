@@ -31,7 +31,6 @@ async def app_product_to_fridge(
 ):
     return await service.create_product(request=request, user_id=current_user.id)
 
-
 @router.get("/status", response_model=FridgeStatusResponse)
 async def get_fridge_status(
     service: fridge_service_dependency, 
