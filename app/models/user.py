@@ -13,3 +13,4 @@ class User(Base):
     password = Column(String(255),nullable=False)
 
     recipes = relationship("Recipe", back_populates="user", cascade="all, delete-orphan")
+    products = relationship("Product", back_populates="user", cascade="all, delete-orphan")

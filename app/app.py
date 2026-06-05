@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 
 from app.routers import auth as auth_routers
 from app.routers import recipe as recipe_routers
+from app.routers import fridge as fridge_routers
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -23,6 +24,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="FridgeChef API", lifespan=lifespan)
 app.include_router(router=auth_routers.router)
 app.include_router(router=recipe_routers.router)
+app.include_router(router=fridge_routers.router)
 
 app.add_middleware(
     CORSMiddleware,
