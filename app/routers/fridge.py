@@ -37,3 +37,18 @@ async def get_fridge_status(
     current_user: user_dependency
 ):
     return await service.get_fridge_status(user_id=current_user.id)
+
+@router.delete("/{product_id}",status_code=status.HTTP_204_NO_CONTENT)
+async def delete_product(
+    product_id: uuid.UUID,
+    product_service: fridge_service_dependency,
+    current_user: user_dependency
+):
+    return await product_service.delete_product(product_id=product_id, user_id=current_user.id)
+
+@router.delete("/cleaning", status_code=status.HTTP_200_OK)
+async def cleaning_fridge(
+    product_service: fridge_service_dependency,
+    current_user: user_dependency
+):
+    return await product_service.cleaning_all_product_in_fridge(user_id=current_user.id)
