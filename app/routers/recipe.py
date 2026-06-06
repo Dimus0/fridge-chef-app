@@ -53,3 +53,11 @@ async def generate_recipe_endpoint(
     current_user: user_dependency
 ):
     return await recipe_service.generate_recipe_ai(request_data,user_id=current_user.id)
+
+# New features
+@router.get("/available", response_model=List[RecipeRead], status_code=status.HTTP_200_OK)
+async def recipe_matching_endpoint(
+    recipe_services: recipe_service_dependency,
+    current_user: user_dependency
+):
+    return await recipe_services.recipe_matching(user_id=current_user.id)

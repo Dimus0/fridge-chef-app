@@ -2,11 +2,11 @@ import uuid
 from fastapi import HTTPException,status
 from sqlalchemy import select, update,delete
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from sqlalchemy.exc import IntegrityError
 from app.models.product import Product as ProductModel
-from app.schemas.product import ProductBase,ProductCreate,ProductRead
+from app.schemas.product import ProductCreate
 
-from datetime import date, datetime,timezone,timedelta 
+from datetime import date,timedelta 
 
 class FridgeService:
     def __init__(self, db: AsyncSession):
@@ -29,7 +29,46 @@ class FridgeService:
 
         return new_product
     
-    async def get_all_product_for_user_on_fridge(self, user_id: uuid.UUID):
+    # test
+    async def delete_product(self, product_id: uuid.UUID, user_id: uuid.UUID) -> dict:
+        product = await self.get_product_by_id(product_id, user_id)
+
+        if not product:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, 
+                detail="Product not found"
+            )
+        
+        try:
+            await self.db.execute(
+                delete(ProductModel).where(ProductModel.id == product_id)
+            )
+            await self.db.commit()
+            
+            return {
+                "status": "success",
+                "message": "Product deleted successfully"
+            }
+        except IntegrityError as e:
+            await self.db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot delete product due to foreign key constraints"
+            )
+    # test
+    async def cleaning_all_product_in_fridge(self, user_id: uuid.UUID):
+        product = await self.db.execute(
+            delete(ProductModel).where(ProductModel.user_id == user_id)
+        )
+        
+        self.db.commit()
+
+        return {
+            "status": "success",
+            "message": f"Fridge has been clear! {product.rowcount} products deleted"
+        }
+        
+    async def get_all_product_for_user_in_fridge(self, user_id: uuid.UUID):
         result = await self.db.execute(
             select(ProductModel).where(ProductModel.user_id == user_id)
         )

@@ -6,7 +6,10 @@ import json
 from openai import AsyncOpenAI
 import requests
 from app.models.recipe import Recipe as RecipeModel
+from app.models.product import Product as ProductModel
+
 from app.schemas.recipe import RecipeCreate, RecipeUpdate,RecipeGenerateRequest,RecipeGenerateResponse
+from app.schemas.product import ProductBase,ProductRead
 
 ai_client = AsyncOpenAI(
     base_url="https://openrouter.ai/api/v1",
@@ -128,3 +131,27 @@ class RecipeService:
         await self.db.refresh(new_recipe)
 
         return new_recipe
+
+    # Потрібне тестування
+    async def recipe_matching(self, user_id: uuid.UUID) -> list:
+        products = await self.db.execute(
+            select(ProductModel).where(ProductModel.user_id == user_id)
+        )
+        db_products = products.scalars().all()
+        fridge_set = {p.product_name.strip().lower() for p in db_products}
+
+        recipies = await self.get_all_recipe_for_user(user_id=user_id)
+
+        available_recipes = []
+
+        for recipe in recipies:
+
+            recipe_ingredients_list = [ingr.strip().lower() for ingr in recipe.ingredients.split(",")]
+
+            recipe_set = set(recipe_ingredients_list)
+
+            if recipe_set.issubset(fridge_set):
+                available_recipes.append(recipe)
+
+        return available_recipes
+
