@@ -1,0 +1,21 @@
+For build a container in docker:
+
+    docker compose up --build -d
+
+Створення нових міграцій якщо маю зміни в коді:
+
+    docker compose exec api uv run alembic revision --autogenerate -m "Опис змін"
+
+Restart container:
+
+    docker compose restart api
+
+
+Запуск локально
+    1. Запустити тільки базу даних у фоні
+
+        docker compose up -d db
+
+    2. Запустити бекенд локально через uv
+
+        uv run uvicorn app.app:app --reload

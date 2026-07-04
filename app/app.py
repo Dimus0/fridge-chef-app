@@ -1,7 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.db.database import create_db_tables
-from contextlib import asynccontextmanager
 
 from app.routers import auth as auth_routers
 from app.routers import recipe as recipe_routers

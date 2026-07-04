@@ -2,7 +2,7 @@ import uuid
 from fastapi import HTTPException, status
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.shoppingcart import ShoppingItem as ShoppingItemModel
+from app.models.shoppingcart import ShoppingCart as ShoppingItemModel
 from app.schemas.shopping import ShoppingItemCreate
 
 class ShoppingService:

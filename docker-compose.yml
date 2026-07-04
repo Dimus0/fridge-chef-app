@@ -14,10 +14,16 @@ services:
     build: .
     env_file:
       - .env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:password@db:5432/fridgechef_db
+      - RUNNING_IN_DOCKER=true
     depends_on:
       - db
     ports:
       - "8000:8000"
+    command: sh -c "uv run alembic upgrade head && uv run uvicorn app.app:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - .:/workspace
 
 volumes:
   postgres_data:
