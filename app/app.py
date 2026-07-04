@@ -8,21 +8,8 @@ from app.routers import recipe as recipe_routers
 from app.routers import fridge as fridge_routers
 from app.routers import shopping as shopping_routers
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    print("Перевіряємо БД та створюємо таблиці")
 
-    try:
-        await create_db_tables()
-        print("Table a sucsses created!")
-    except Exception as e:
-        print(f"Error: {e}")
-
-    yield
-
-    print("Server STOPED")
-
-app = FastAPI(title="FridgeChef API", lifespan=lifespan)
+app = FastAPI(title="FridgeChef API")
 
 app.include_router(router=auth_routers.router)
 app.include_router(router=recipe_routers.router)
