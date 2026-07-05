@@ -16,7 +16,6 @@
 
 1. Copy `.env.example` to `.env` and fill in secrets.
 2. Install dependencies with `uv sync`.
-3. Run migrations with `uv run alembic upgrade head`.
 4. Start the API with `uv run python main.py`.
 
 ## Main endpoints
@@ -38,6 +37,3 @@
 - Tests: `uv run pytest`
 - CI runs lint + tests on pushes and pull requests.
 
-## Docker
-
-Use `docker compose up --build` to start the API and Postgres together.

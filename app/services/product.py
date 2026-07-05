@@ -13,6 +13,7 @@ class FridgeService:
         self.db = db
 
     async def create_product(self, request: ProductCreate, user_id: uuid.UUID) -> ProductModel:
+
         exp_date = request.expiration_date
         if hasattr(exp_date, "date"):
             exp_date = exp_date.date()
@@ -20,7 +21,7 @@ class FridgeService:
         new_product = ProductModel(
             user_id = user_id,
             product_name = request.product_name,
-            expiration_date = exp_date
+            expiration_date = exp_date,
         )
 
         self.db.add(new_product)
@@ -57,16 +58,24 @@ class FridgeService:
             )
     # test
     async def cleaning_all_product_in_fridge(self, user_id: uuid.UUID):
-        product = await self.db.execute(
-            delete(ProductModel).where(ProductModel.user_id == user_id)
-        )
-        
-        self.db.commit()
+        try:
+            products = await self.db.execute(
+                delete(ProductModel).where(ProductModel.user_id == user_id)
+            )
+            
+            await self.db.commit()
 
-        return {
-            "status": "success",
-            "message": f"Fridge has been clear! {product.rowcount} products deleted"
-        }
+            return {
+                "status": "success",
+                "message": "Fridge has been cleared! All products deleted."
+            }
+        except Exception as e:
+            await self.db.rollback()
+            print(f"🚨 Помилка при очищенні холодильника: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="Could not clear the fridge"
+            )
         
     async def get_all_product_for_user_in_fridge(self, user_id: uuid.UUID):
         result = await self.db.execute(
@@ -87,7 +96,7 @@ class FridgeService:
     
     async def get_fridge_status(self, user_id: uuid.UUID) -> dict:
 
-        products = await self.get_all_product_for_user_on_fridge(user_id=user_id)
+        products = await self.get_all_product_for_user_in_fridge(user_id=user_id)
 
         expired_list = []
         spoiling_soon_list = []
